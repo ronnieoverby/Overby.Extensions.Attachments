@@ -5,10 +5,8 @@
 
   "packOptions": {
     "summary": "Attach anything to anything!",
-    "repository": {
-      "url": "https://github.com/ronnieoverby/Overby.Extensions.Attachments",
-      "type": "git"
-    }
+    "licenseUrl": "https://github.com/ronnieoverby/Overby.Extensions.Attachments/blob/master/LICENSE.md",
+    "projectUrl": "https://github.com/ronnieoverby/Overby.Extensions.Attachments"
   },
 
   "dependencies": {
