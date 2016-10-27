@@ -4,7 +4,11 @@
   "authors": [ "Ronnie Overby" ],
 
   "packOptions": {
-    "summary": "Attach anything to anything!" 
+    "summary": "Attach anything to anything!",
+    "repository": {
+      "url": "https://github.com/ronnieoverby/Overby.Extensions.Attachments",
+      "type": "git"
+    }
   },
 
   "dependencies": {
