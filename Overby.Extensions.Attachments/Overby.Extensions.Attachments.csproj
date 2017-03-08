@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Authors>Ronnie Overby</Authors>
+    <TargetFrameworks>netstandard1.3;net40</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Overby.Extensions.Attachments</AssemblyName>
+    <PackageId>Overby.Extensions.Attachments</PackageId>
+    <PackageProjectUrl>https://github.com/ronnieoverby/Overby.Extensions.Attachments</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/ronnieoverby/Overby.Extensions.Attachments/blob/master/LICENSE.md</PackageLicenseUrl>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Version>1.1.0</Version>
+    <PackageReleaseNotes>Added method to copy attachments from one host object to another.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

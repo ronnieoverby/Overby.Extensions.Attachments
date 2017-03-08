@@ -5,10 +5,32 @@ using System.Runtime.CompilerServices;
 
 namespace Overby.Extensions.Attachments
 {
-    public static class AttachmentExtensions
+    /// <summary>
+    /// Extensions for attaching values to objects.
+    /// </summary>
+    public static partial class AttachmentExtensions
     {
         private static readonly ConditionalWeakTable<object, ConcurrentDictionary<string, object>> _attachmentTable =
             new ConditionalWeakTable<object, ConcurrentDictionary<string, object>>();
+
+        /// <summary>
+        /// Copies attachments from one object to another.
+        /// </summary>
+        /// <param name="source">The source object to get attachments from.</param>
+        /// <param name="target">The target object to set attachments on.</param>
+        /// <param name="keyPredicate">An optional predicate of key values.</param>
+        public static void CopyAttachments(this object source, object target, Func<string, bool> keyPredicate = null)
+        {
+            foreach (var key in source.GetAttachmentKeys())
+            {
+                if (keyPredicate?.Invoke(key) == false)
+                    continue;
+
+                var result = source.GetAttached(key);
+                if (result.Found)
+                    target.SetAttached(result.Value, key);
+            }
+        }
 
         /// <summary>
         /// Atomically gets or sets an attached value if it's found.
@@ -53,8 +75,7 @@ namespace Overby.Extensions.Attachments
                 throw new ArgumentNullException(nameof(key));
 
             var dict = _attachmentTable.GetOrCreateValue(host);
-            object value;
-            var found = dict.TryGetValue(key, out value);
+            var found = dict.TryGetValue(key, out object value);
             return new AttachmentResult<object>(found, value);
         }
 
@@ -70,16 +91,17 @@ namespace Overby.Extensions.Attachments
         {
             key = key ?? typeof(T).AssemblyQualifiedName;
             var dict = _attachmentTable.GetOrCreateValue(host);
-            object value;
-            var found = dict.TryGetValue(key, out value);
+            var found = dict.TryGetValue(key, out object value);
             var castValue = found ? (T)value : default(T);
             return new AttachmentResult<T>(found, castValue);
         }
 
+        /// <summary>
+        /// Returns all of the attachment keys found for the host object.
+        /// </summary>
         public static ICollection<string> GetAttachmentKeys(this object host)
         {
-            ConcurrentDictionary<string, object> dict;
-            if (_attachmentTable.TryGetValue(host, out dict))
+            if (_attachmentTable.TryGetValue(host, out ConcurrentDictionary<string, object> dict))
                 return dict.Keys;
 
             return new string[0];
@@ -96,8 +118,7 @@ namespace Overby.Extensions.Attachments
         public static AttachmentResult<object> RemoveAttached(this object host, string key)
         {
             var dict = _attachmentTable.GetOrCreateValue(host);
-            object value;
-            var found = dict.TryRemove(key, out value);
+            var found = dict.TryRemove(key, out object value);
             return new AttachmentResult<object>(found, value);
         }
 
@@ -109,8 +130,7 @@ namespace Overby.Extensions.Attachments
         {
             key = key ?? typeof(T).AssemblyQualifiedName;
             var dict = _attachmentTable.GetOrCreateValue(host);
-            object value;
-            var found = dict.TryRemove(key, out value);
+            var found = dict.TryRemove(key, out object value);
             var castValue = found ? (T)value : default(T);
             return new AttachmentResult<T>(found, castValue);
         }
@@ -122,19 +142,5 @@ namespace Overby.Extensions.Attachments
         /// </summary>
         public static Guid GetReferenceId(this object obj) =>
             obj.GetOrSetAttached(() => Guid.NewGuid(), RefIdKey);
-
-        public class AttachmentResult<T>
-        {
-            public bool Found { get; }
-            public T Value { get; }
-
-            public AttachmentResult(bool found, T value)
-            {
-                Found = found;
-                Value = value;
-            }
-
-            public static implicit operator T(AttachmentResult<T> result) => result.Value;
-        }
     }
 }
