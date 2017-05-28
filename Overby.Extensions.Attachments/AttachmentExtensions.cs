@@ -21,6 +21,12 @@ namespace Overby.Extensions.Attachments
         /// <param name="keyPredicate">An optional predicate of key values.</param>
         public static void CopyAttachments(this object source, object target, Func<string, bool> keyPredicate = null)
         {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            if (target == null)
+                throw new ArgumentNullException(nameof(target));
+
             foreach (var key in source.GetAttachmentKeys())
             {
                 if (keyPredicate?.Invoke(key) == false)
@@ -37,6 +43,12 @@ namespace Overby.Extensions.Attachments
         /// </summary>
         public static AttachmentResult<T> GetOrSetAttached<T>(this object host, Func<T> factory, string key = null)
         {
+            if (host == null)
+                throw new ArgumentNullException(nameof(host));
+
+            if (factory == null)
+                throw new ArgumentNullException(nameof(factory));
+
             key = key ?? typeof(T).AssemblyQualifiedName;
             var dict = _attachmentTable.GetOrCreateValue(host);
             var found = true;
@@ -52,6 +64,9 @@ namespace Overby.Extensions.Attachments
         /// </summary>
         public static void SetAttached(this object host, object value, string key = null)
         {
+            if (host == null)
+                throw new ArgumentNullException(nameof(host));
+
             if (value == null && key == null)
                 throw new ArgumentNullException(key, $"{nameof(value)} or {nameof(key)} must be provided");
 
@@ -59,6 +74,13 @@ namespace Overby.Extensions.Attachments
             var dict = _attachmentTable.GetOrCreateValue(host);
             dict[key] = value;
         }
+
+        /// <summary>
+        /// Sets an attached value. Any existing value will be overwritten.
+        /// The value's assembly qualified type name will be used for the key.
+        /// </summary>
+        public static void SetAttached<T>(this object host, T value) =>
+            SetAttached(host, value, typeof(T).AssemblyQualifiedName);
 
         /// <summary>
         /// Gets an attached value using the type's AssemblyQualifiedName as the key.
@@ -89,6 +111,9 @@ namespace Overby.Extensions.Attachments
         /// <returns></returns>
         public static AttachmentResult<T> GetAttached<T>(this object host, string key = null)
         {
+            if (host == null)
+                throw new ArgumentNullException(nameof(host));
+
             key = key ?? typeof(T).AssemblyQualifiedName;
             var dict = _attachmentTable.GetOrCreateValue(host);
             var found = dict.TryGetValue(key, out object value);
@@ -101,6 +126,9 @@ namespace Overby.Extensions.Attachments
         /// </summary>
         public static ICollection<string> GetAttachmentKeys(this object host)
         {
+            if (host == null)
+                throw new ArgumentNullException(nameof(host));
+
             if (_attachmentTable.TryGetValue(host, out ConcurrentDictionary<string, object> dict))
                 return dict.Keys;
 
@@ -117,6 +145,13 @@ namespace Overby.Extensions.Attachments
         /// </summary>
         public static AttachmentResult<object> RemoveAttached(this object host, string key)
         {
+
+            if (host == null)
+                throw new ArgumentNullException(nameof(host));
+
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+
             var dict = _attachmentTable.GetOrCreateValue(host);
             var found = dict.TryRemove(key, out object value);
             return new AttachmentResult<object>(found, value);
@@ -128,6 +163,9 @@ namespace Overby.Extensions.Attachments
         /// </summary>
         public static AttachmentResult<T> RemoveAttached<T>(this object host, string key = null)
         {
+            if (host == null)
+                throw new ArgumentNullException(nameof(host));
+
             key = key ?? typeof(T).AssemblyQualifiedName;
             var dict = _attachmentTable.GetOrCreateValue(host);
             var found = dict.TryRemove(key, out object value);
@@ -135,12 +173,32 @@ namespace Overby.Extensions.Attachments
             return new AttachmentResult<T>(found, castValue);
         }
 
-        private static string RefIdKey = Guid.NewGuid().ToString();
+        private static string UniquePrefix = Guid.NewGuid().ToString();
+        private static string RefIdKey = $"{UniquePrefix}:{nameof(GetReferenceId)}";
 
         /// <summary>
         /// Unique identifier for the object reference.
         /// </summary>
         public static Guid GetReferenceId(this object obj) =>
             obj.GetOrSetAttached(() => Guid.NewGuid(), RefIdKey);
+
+
+        /// <summary>
+        /// Get's an extension property.
+        /// </summary>
+        public static ExtensionProperty<T> GetExtensionProperty<T>(this object host, Optional<T> optionalValue = default(Optional<T>), [CallerMemberName]string propertyName = null)
+        {
+            if (host == null)
+                throw new ArgumentNullException(nameof(host));
+
+            var attachmentKey = $"{UniquePrefix}:{typeof(T).AssemblyQualifiedName}:{propertyName}";
+            var extensionProperty = host.GetOrSetAttached(() =>
+                new ExtensionProperty<T>(attachmentKey), attachmentKey).Value;
+
+            if (optionalValue.Set)
+                extensionProperty.Value = optionalValue;
+
+            return extensionProperty;
+        }
     }
 }
