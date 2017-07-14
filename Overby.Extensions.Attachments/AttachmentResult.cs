@@ -23,8 +23,14 @@
                 Found = found;
                 Value = value;
             }
-                        
-            public static implicit operator T(AttachmentResult<T> result) => result.Value;
+
+            public static implicit operator T(AttachmentResult<T> result)
+            {
+                if (result == null)
+                    return default(T);
+
+                return result.Value;
+            }
         }
     }
 }

@@ -12,8 +12,9 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>1.1.0</Version>
-    <PackageReleaseNotes>Added method to copy attachments from one host object to another.</PackageReleaseNotes>
+    <Version>1.1.1</Version>
+    <PackageReleaseNotes>Fix bug with Attachment result where result is null.</PackageReleaseNotes>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
