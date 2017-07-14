@@ -1,12 +1,21 @@
 ﻿using NUnit.Framework;
 using Overby.Extensions.Attachments;
 using System;
+using static Overby.Extensions.Attachments.AttachmentExtensions;
 
 namespace Tests
 {
     [TestFixture]
     public class AttachmentTests
     {
+        [Test]
+        public void FixedNullAttachmentResultImplicitOperator()
+        {
+            AttachmentResult<string> r = null;
+            string s = r;
+            Assert.IsNull(s);
+        }
+
         [Test]
         public void CanRemoveAttachments()
         {
