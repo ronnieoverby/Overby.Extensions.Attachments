@@ -12,3 +12,6 @@ PM> Install-Package Overby.Extensions.Attachments
 ## Examples
 
 See unit tests for example usage.
+
+## See Also
+https://en.wikipedia.org/wiki/Ephemeron
