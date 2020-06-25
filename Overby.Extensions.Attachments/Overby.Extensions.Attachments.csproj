@@ -15,7 +15,15 @@
     <Version>1.2.0</Version>
     <PackageReleaseNotes>Fix bug with Attachment result where result is null. Extension properties. Considered non-beta.</PackageReleaseNotes>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
     <Reference Include="System" />
